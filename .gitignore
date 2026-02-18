@@ -43,3 +43,40 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Flutter build & generated
+build/
+*.iml
+.flutter-plugins
+
+# IDE
+.vscode/
+*.code-workspace
+
+# OS
+Thumbs.db
+
+# Android
+android/.gradle/
+android/local.properties
+android/**/key.properties
+*.jks
+*.keystore
+
+# iOS
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Flutter/flutter_export_environment.sh
+
+# Web / Chrome dev
+.dart_tool/chrome-device/
+
+# Coverage & test
+coverage/
+*.lcov
+
+# Generated code (if used later)
+*.g.dart
+*.freezed.dart
