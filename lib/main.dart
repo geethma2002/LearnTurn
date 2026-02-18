@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-import 'screens/home_screen.dart';
+import 'core/theme/app_theme.dart';
+import 'core/router/app_router.dart';
+import 'core/providers/theme_mode_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -10,29 +13,28 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
   } catch (e) {
-    // If Firebase fails to initialize (missing config or unsupported platform),
-    // continue running the app with mock/local data so UI can be shown.
-    // The app's services handle falling back to mock data when Firestore calls fail.
-    // Print the error for debugging.
-    // ignore: avoid_print
-    print('Warning: Firebase.initializeApp failed: $e');
+    debugPrint('Warning: Firebase.initializeApp failed: $e');
   }
-  runApp(const LearnTurnApp());
+  runApp(
+    const ProviderScope(
+      child: LearnTurnApp(),
+    ),
+  );
 }
 
-class LearnTurnApp extends StatelessWidget {
+class LearnTurnApp extends ConsumerWidget {
   const LearnTurnApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(goRouterProvider);
+    final themeMode = ref.watch(themeModeProvider);
+    return MaterialApp.router(
       title: 'LearnTurn',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
-      home: const HomeScreen(),
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      themeMode: themeMode,
+      routerConfig: router,
     );
   }
 }
-
