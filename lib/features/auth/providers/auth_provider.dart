@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_constants.dart';
@@ -28,10 +29,28 @@ class AuthService {
     required UserRole role,
     String? displayName,
   }) async {
-    final cred = await _auth.createUserWithEmailAndPassword(
-      email: email.trim(),
-      password: password,
-    );
+    UserCredential cred;
+    try {
+      cred = await _auth.createUserWithEmailAndPassword(
+        email: email.trim(),
+        password: password,
+      );
+    } on FirebaseAuthException catch (e) {
+      switch (e.code) {
+        case 'email-already-in-use':
+          throw Exception('This email is already registered. Sign in instead.');
+        case 'invalid-email':
+          throw Exception('Invalid email address.');
+        case 'weak-password':
+          throw Exception('Password is too weak. Use at least 6 characters.');
+        case 'operation-not-allowed':
+          throw Exception('Email sign-up is disabled. Enable it in Firebase Console → Authentication → Sign-in method.');
+        case 'network-request-failed':
+          throw Exception('Network error. Check your connection.');
+        default:
+          throw Exception(e.message ?? 'Sign up failed. Please try again.');
+      }
+    }
     final uid = cred.user!.uid;
     final user = AppUser(
       uid: uid,
@@ -39,26 +58,56 @@ class AuthService {
       role: role,
       displayName: displayName?.trim(),
     );
-    await _db.collection(AppCollections.users).doc(uid).set(user.toMap());
-    if (role == UserRole.tutor) {
-      await _db.collection(AppCollections.tutors).doc(uid).set({
-        'userId': uid,
-        'createdAt': FieldValue.serverTimestamp(),
-      });
-    } else {
-      await _db.collection(AppCollections.students).doc(uid).set({
-        'userId': uid,
-        'createdAt': FieldValue.serverTimestamp(),
-      });
+    try {
+      await _db.collection(AppCollections.users).doc(uid).set(user.toMap());
+      if (role == UserRole.tutor) {
+        await _db.collection(AppCollections.tutors).doc(uid).set({
+          'userId': uid,
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+      } else {
+        await _db.collection(AppCollections.students).doc(uid).set({
+          'userId': uid,
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+      }
+    } on FirebaseException catch (e) {
+      await _auth.currentUser?.delete();
+      if (e.code == 'permission-denied') {
+        throw Exception('Permission denied. In Firebase Console: deploy Firestore rules (firebase deploy --only firestore:rules) or set rules to allow writes.');
+      }
+      rethrow;
+    } catch (e) {
+      await _auth.currentUser?.delete();
+      rethrow;
     }
     return user;
   }
 
   Future<AppUser> signIn({required String email, required String password}) async {
-    await _auth.signInWithEmailAndPassword(
-      email: email.trim(),
-      password: password,
-    );
+    try {
+      await _auth.signInWithEmailAndPassword(
+        email: email.trim(),
+        password: password,
+      );
+    } on FirebaseAuthException catch (e) {
+      switch (e.code) {
+        case 'user-not-found':
+          throw Exception('No account found for this email. Please sign up first.');
+        case 'wrong-password':
+          throw Exception('Wrong password. Please try again.');
+        case 'invalid-credential':
+          throw Exception('Invalid email or password.');
+        case 'invalid-email':
+          throw Exception('Invalid email address.');
+        case 'user-disabled':
+          throw Exception('This account has been disabled.');
+        case 'network-request-failed':
+          throw Exception('Network error. Check your connection.');
+        default:
+          throw Exception(e.message ?? 'Sign in failed. Please try again.');
+      }
+    }
     final uid = _auth.currentUser!.uid;
     final doc = await _db.collection(AppCollections.users).doc(uid).get();
     if (!doc.exists) {

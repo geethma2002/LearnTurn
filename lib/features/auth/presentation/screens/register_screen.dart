@@ -51,10 +51,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             role: _role,
             displayName: _name.text,
           );
-      if (mounted) context.go(_role.isStudent ? '/student' : '/tutor');
+      if (mounted) {
+        setState(() => _loading = false);
+        context.go(_role.isStudent ? '/student' : '/tutor');
+      }
     } catch (e) {
       setState(() {
-        _error = e.toString().replaceFirst(RegExp(r'\[.*?\] '), '').split('.').first;
+        String msg = e.toString().replaceFirst(RegExp(r'\[.*?\] '), '').replaceFirst('Exception: ', '');
+        _error = msg.length > 120 ? '${msg.split('.').first}.' : msg;
         _loading = false;
       });
     }
@@ -139,7 +143,20 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               ),
               if (_error != null) ...[
                 const SizedBox(height: 16),
-                Text(_error!, style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.error)),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.errorContainer,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.error_outline, color: theme.colorScheme.error, size: 24),
+                      const SizedBox(width: 12),
+                      Expanded(child: Text(_error!, style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onErrorContainer))),
+                    ],
+                  ),
+                ),
               ],
               const SizedBox(height: 24),
               FilledButton(
