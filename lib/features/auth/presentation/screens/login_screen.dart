@@ -41,7 +41,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       }
     } catch (e) {
       setState(() {
-        final msg = e.toString().replaceFirst(RegExp(r'\[.*?\] '), '');
+        String msg = e.toString().replaceFirst(RegExp(r'\[.*?\] '), '').replaceFirst('Exception: ', '');
         _error = msg.length > 120 ? '${msg.split('.').first}.' : msg;
         _loading = false;
       });
@@ -86,7 +86,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               if (_error != null) ...[
                 const SizedBox(height: 16),
-                Text(_error!, style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.error)),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.errorContainer,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.error_outline, color: theme.colorScheme.error, size: 24),
+                      const SizedBox(width: 12),
+                      Expanded(child: Text(_error!, style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onErrorContainer))),
+                    ],
+                  ),
+                ),
               ],
               const SizedBox(height: 24),
               FilledButton(
