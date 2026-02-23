@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
 import 'core/theme/app_theme.dart';
 import 'core/router/app_router.dart';
@@ -12,6 +13,11 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    // Test write: visible in Firestore console under collection "test"
+    FirebaseFirestore.instance.collection('test').add({
+      'name': 'Geethma',
+      'app': 'LearnTurn',
+    }).catchError((e) => debugPrint('Firestore test write failed: $e'));
   } catch (e) {
     debugPrint('Warning: Firebase.initializeApp failed: $e');
   }

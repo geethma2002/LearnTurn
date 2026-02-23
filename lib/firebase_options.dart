@@ -2,22 +2,19 @@
 // ignore_for_file: lines_longer_than_80_chars, avoid_classes_with_only_static_members
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 
-/// A placeholder class for Firebase configuration.
-/// Replace projectId, apiKey, appId, messagingSenderId, storageBucket with your Firebase project values.
+/// Replace with your project values from Firebase Console, or run: dart pub global run flutterfire_cli:flutterfire configure
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
-    // For development/demo, using placeholder values.
-    // Replace these with your actual Firebase project credentials.
     return web;
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyDemoKeyForWeb',  // Replace with your Web API Key
-    appId: '1:123456789:web:abcd1234efgh5678',  // Replace with your Web App ID
-    messagingSenderId: '123456789',  // Replace with your Messaging Sender ID
-    projectId: 'learnturn-demo',  // Replace with your Firebase Project ID
-    authDomain: 'learnturn-demo.firebaseapp.com',  // Replace with your Auth Domain
-    storageBucket: 'learnturn-demo.appspot.com',  // Replace with your Storage Bucket
-    measurementId: 'G-DEMO1234567',  // Replace with your Measurement ID (optional)
+    apiKey: 'AIzaSyDemoKeyForWeb',
+    appId: '1:123456789:web:abcd1234efgh5678',
+    messagingSenderId: '123456789',
+    projectId: 'learnturn-7e707',
+    authDomain: 'learnturn-7e707.firebaseapp.com',
+    storageBucket: 'learnturn-7e707.appspot.com',
+    measurementId: 'G-DEMO1234567',
   );
 }

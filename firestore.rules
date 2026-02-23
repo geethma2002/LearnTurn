@@ -7,8 +7,10 @@ service cloud.firestore {
     function isOwner(uid) {
       return request.auth != null && request.auth.uid == uid;
     }
-    function getUserRole() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+
+    // Temporary: remove in production. Allows main() test write and console check.
+    match /test/{doc} {
+      allow read, write: if true;
     }
 
     match /users/{userId} {

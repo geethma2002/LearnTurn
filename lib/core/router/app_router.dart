@@ -19,19 +19,19 @@ import '../../features/chat/presentation/screens/chat_screen.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
+  final currentUser = ref.watch(currentUserProvider);
   return GoRouter(
     initialLocation: '/',
     debugLogDiagnostics: true,
     redirect: (context, state) {
       final isProtected = state.matchedLocation.startsWith('/student') || state.matchedLocation.startsWith('/tutor');
-      // After sign-up/sign-in we go to /student or /tutor; auth stream may not have updated yet. Don't redirect away while loading.
-      if (authState.isLoading && isProtected) return null;
-      final isLoggedIn = authState.valueOrNull != null;
+      if (authState.isLoading && isProtected && currentUser == null) return null;
+      final isLoggedIn = currentUser != null;
       final isLanding = state.matchedLocation == '/';
       final isAuth = state.matchedLocation == '/login' || state.matchedLocation == '/register';
       if (!isLoggedIn && !isLanding && !isAuth) return '/';
       if (isLoggedIn && (isLanding || isAuth)) {
-        final role = authState.valueOrNull?.role;
+        final role = currentUser?.role;
         if (role != null) return role.isStudent ? '/student' : '/tutor';
       }
       return null;

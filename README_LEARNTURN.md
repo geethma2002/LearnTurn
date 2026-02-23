@@ -1,6 +1,6 @@
 # LearnTurn – Tutor–Student Marketplace
 
-Flutter mobile app with Firebase backend: landing, auth (email/password + role), student and tutor dashboards, tutor search, bookings, real-time chat, reviews, favorites, and dark mode.
+Flutter web app with Firebase backend: landing, auth (email/password + role), student and tutor dashboards, tutor search, bookings, real-time chat, reviews, favorites, and dark mode.
 
 ## Setup
 

@@ -17,6 +17,16 @@ final authStateProvider = StreamProvider<AppUser?>((ref) {
   });
 });
 
+/// When set, app shows dashboard without real sign-in (for demo/preview).
+final demoUserProvider = StateProvider<AppUser?>((ref) => null);
+
+/// Current user: demo user if set, otherwise signed-in user.
+final currentUserProvider = Provider<AppUser?>((ref) {
+  final demo = ref.watch(demoUserProvider);
+  if (demo != null) return demo;
+  return ref.watch(authStateProvider).valueOrNull;
+});
+
 final authServiceProvider = Provider<AuthService>((ref) => AuthService());
 
 class AuthService {
